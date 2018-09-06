@@ -21,25 +21,52 @@ var userSchema = new mongoose.Schema(
 
 var users = mongoose.model("users", userSchema);
 
+
+
+
 /*users.find(function(err, users) {
            if (err) return console.error(err);
            console.log(users);
            });
 */ //This Shows all the database contents of users
 
+
+
+
+
+
 app.get("/", (req, res) => {
         res.sendFile(__dirname + "/index.html");
+        });
+
+app.get("/search", (req, res) => {
+        res.sendFile(__dirname + "/search.html");
         });
 
 app.post("/addname", (req, res) => {
          var myData = new users(req.body);
          myData.save()
          .then(item => {
-               res.send("item saved to database");
+               //res.send("item saved to database"); //use this for debugging!
+               res.sendFile(__dirname + "/index.html") // Redirects to home page
                })
+         
          .catch(err => {
                 res.status(400).send("unable to save to database");
                 });
+         });
+
+app.post("/search", (req, res) => {
+         var searchString = req.body.email;
+         console.log("This is a search post");
+         console.log(searchString);
+         var query = users.find({});
+         
+         query.where('password').in([searchString]);
+         query.exec(function (err, docs) {
+         console.log(docs);
+          });
+           //Finds entry that is sent by user and stored in searchString
          });
 
 app.listen(port, () => {
