@@ -5,9 +5,10 @@ var port = 3001;
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/ChildhoodAppDB");
+var db = mongoose.connection;
 
 
 var userSchema = new mongoose.Schema(
@@ -20,6 +21,11 @@ var userSchema = new mongoose.Schema(
 
 var users = mongoose.model("users", userSchema);
 
+/*users.find(function(err, users) {
+           if (err) return console.error(err);
+           console.log(users);
+           });
+*/ //This Shows all the database contents of users
 
 app.get("/", (req, res) => {
         res.sendFile(__dirname + "/index.html");
