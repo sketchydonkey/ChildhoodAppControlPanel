@@ -43,11 +43,15 @@ app.get("/search", (req, res) => {
         res.sendFile(__dirname + "/search.html");
         });
 
-app.post("/addname", (req, res) => {
+app.get("/remove", (req, res) => {
+        res.sendFile(__dirname + "/remove.html");
+        });
+
+app.post("/addname", (req, res) => { //adds users
          var myData = new users(req.body);
          myData.save()
          .then(item => {
-               //res.send("item saved to database"); //use this for debugging!
+               //res.send("item saved to database"); //use this for debugging!  -- Add checking for existing user
                res.sendFile(__dirname + "/index.html") // Redirects to home page
                })
          
@@ -56,18 +60,42 @@ app.post("/addname", (req, res) => {
                 });
          });
 
-app.post("/search", (req, res) => {
-         var searchString = req.body.email;
+app.post("/search", (req, res) => { //searches users
+         var searchString = req.body.data;
          console.log("This is a search post");
          console.log(searchString);
          var query = users.find({});
          
          query.where('password').in([searchString]);
          query.exec(function (err, docs) {
-         console.log(docs);
+                   if (docs == [])
+                    {
+                    console.log("nothing found")
+                    }
+                    else
+                    {
+                    console.log(docs);
+                    }
           });
            //Finds entry that is sent by user and stored in searchString
          });
+
+
+app.post("/remove", (req, res) => { //removes users
+         var removeString = req.body.password;
+         console.log("This is a search post");
+         console.log(removeString);
+         var query = users.deleteOne({});
+         
+         query.where('password').in([removeString]);
+         query.exec(function (err) {
+         
+                    });
+         
+         //need to add error handling
+         });
+
+
 
 app.listen(port, () => {
            console.log("Server listening on port " + port);
