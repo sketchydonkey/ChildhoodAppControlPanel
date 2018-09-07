@@ -36,6 +36,10 @@ var users = mongoose.model("users", userSchema);
 
 
 app.get("/", (req, res) => {
+        res.sendFile(__dirname + "/index.html");
+        });
+
+  app.get("/add", (req, res) => {
         res.sendFile(__dirname + "/add.html");
         });
 
@@ -52,16 +56,12 @@ app.get("/remove", (req, res) => {
         });
 
 app.post("/addname", (req, res) => { //adds users
-         var myData = new users(req.body);
-         myData.save()
-         .then(item => {
-               //res.send("item saved to database"); //use this for debugging!  -- Add checking for existing user
-               res.sendFile(__dirname + "/add.html") // Redirects to home page
-               })
+         var userToAdd = new users(req.body);
+         userToAdd.save();
 
-         .catch(err => {
-                res.status(400).send("unable to save to database");
-                });
+               //res.send("item saved to database"); //use this for debugging!  -- Add checking for existing user
+               res.sendFile(__dirname + "/addConf.html"); // Redirects to home page
+               //Need to have a success page and then redirect to the /add part!
          });
 
 app.post("/search", (req, res) => { //searches users
@@ -70,19 +70,16 @@ app.post("/search", (req, res) => { //searches users
          console.log(searchString);
          var query = users.findOne({});
 
-         query.where('password').in([searchString]);
-         query.exec(function (err, docs) {
-                   if (docs == [])
+         query.where('email').in([searchString]);
+         query.exec(function (err, result) {
+                   if (result == null)
                     {
                     console.log("nothing found")
                     }
                     else
                     {
-                    console.log(docs);
-                    docs.set({ email: 'newemail' });
-                    docs.save();
-                    console.log(docs);
-                    res.send(docs);
+                    console.log(result);
+
                     }
           });
            //Finds entry that is sent by user and stored in searchString
@@ -90,40 +87,45 @@ app.post("/search", (req, res) => { //searches users
 
 
 app.post("/remove", (req, res) => { //removes users
-         var removeString = req.body.password;
-         console.log("This is a search post");
-         console.log(removeString);
+         var removeString = req.body.data;
          var query = users.deleteOne({});
 
-         query.where('password').in([removeString]);
+         query.where('email').in([removeString]);
          query.exec(function (err) {
-
+                      //  console.log("Nothing exists!")
                     });
 
-         //need to add error handling
+
          });
 
 
 app.post("/update", (req, res) => { //Updates users password
-         var userUpdate = req.body.email;
-         var updatePassword = req.body.password;
-         var updatePasswordConf = req.body.passwordConf;
-         console.log("This is a update post");
-         console.log(userUpdate);
-         console.log(updatePassword);
-         console.log(updatePasswordConf);
 
-         var updateUserInfo = new users({ email: userUpdate, username: userUpdate, password: updatePassword, passwordConf: updatePasswordConf});
+  var searchString = req.body.email;
+  var newPassword = req.body.password;
+  var passwordConfirm = req.body.passwordConf;
+  console.log("This is a search post");
+  console.log(searchString);
+  var query = users.findOne({});
 
-         console.log(updateUserInfo);
+  query.where('email').in([searchString]);
+  query.exec(function (err, docs) {
+            if (docs == [])
+             {
+             console.log("nothing found")
+             }
+             else
+             {
+             console.log(docs);
+             docs.set({ password: newPassword });
+             docs.set({ passwordConf: passwordConfirm });
+             docs.save();
+             console.log(docs);
+             res.send(docs);
+             }
+   });
 
-
-
-
-
-
-
-         });
+           });
 
 
 app.listen(port, () => {
