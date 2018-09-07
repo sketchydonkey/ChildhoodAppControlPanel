@@ -36,7 +36,7 @@ var users = mongoose.model("users", userSchema);
 
 
 app.get("/", (req, res) => {
-        res.sendFile(__dirname + "/index.html");
+        res.sendFile(__dirname + "/add.html");
         });
 
 app.get("/update", (req, res) => {
@@ -56,9 +56,9 @@ app.post("/addname", (req, res) => { //adds users
          myData.save()
          .then(item => {
                //res.send("item saved to database"); //use this for debugging!  -- Add checking for existing user
-               res.sendFile(__dirname + "/index.html") // Redirects to home page
+               res.sendFile(__dirname + "/add.html") // Redirects to home page
                })
-         
+
          .catch(err => {
                 res.status(400).send("unable to save to database");
                 });
@@ -69,7 +69,7 @@ app.post("/search", (req, res) => { //searches users
          console.log("This is a search post");
          console.log(searchString);
          var query = users.findOne({});
-         
+
          query.where('password').in([searchString]);
          query.exec(function (err, docs) {
                    if (docs == [])
@@ -94,12 +94,12 @@ app.post("/remove", (req, res) => { //removes users
          console.log("This is a search post");
          console.log(removeString);
          var query = users.deleteOne({});
-         
+
          query.where('password').in([removeString]);
          query.exec(function (err) {
-         
+
                     });
-         
+
          //need to add error handling
          });
 
@@ -112,17 +112,17 @@ app.post("/update", (req, res) => { //Updates users password
          console.log(userUpdate);
          console.log(updatePassword);
          console.log(updatePasswordConf);
-         
-         var updateUserInfo = new users({ email: userUpdate, username: userUpdate, password: updatePassword, passwordConf: updatePasswordConf});
-         
-         console.log(updateUserInfo);
-         
-        
-         
 
-        
-         
-    
+         var updateUserInfo = new users({ email: userUpdate, username: userUpdate, password: updatePassword, passwordConf: updatePasswordConf});
+
+         console.log(updateUserInfo);
+
+
+
+
+
+
+
          });
 
 
