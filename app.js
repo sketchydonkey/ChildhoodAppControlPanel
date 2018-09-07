@@ -60,14 +60,12 @@ app.post("/addname", (req, res) => { //adds users
          userToAdd.save();
 
                //res.send("item saved to database"); //use this for debugging!  -- Add checking for existing user
-               res.sendFile(__dirname + "/addConf.html"); // Redirects to home page
+               res.redirect('http://localhost:3001/add'); // Redirects to home page
                //Need to have a success page and then redirect to the /add part!
          });
 
 app.post("/search", (req, res) => { //searches users
          var searchString = req.body.data;
-         console.log("This is a search post");
-         console.log(searchString);
          var query = users.findOne({});
 
          query.where('email').in([searchString]);
@@ -79,7 +77,7 @@ app.post("/search", (req, res) => { //searches users
                     else
                     {
                     console.log(result);
-
+                    res.redirect("http://localhost:3001/search")
                     }
           });
            //Finds entry that is sent by user and stored in searchString
@@ -91,8 +89,18 @@ app.post("/remove", (req, res) => { //removes users
          var query = users.deleteOne({});
 
          query.where('email').in([removeString]);
-         query.exec(function (err) {
-                      //  console.log("Nothing exists!")
+         query.exec(function (err, delUser) {
+
+                      if (delUser.n == 1) // A user exists and was deleted
+                      {
+                         res.redirect("http://localhost:3001/remove");
+                      }
+
+                      else
+                      {
+                        //  console.log("Nothing exists!")
+                      }
+
                     });
 
 
@@ -104,24 +112,20 @@ app.post("/update", (req, res) => { //Updates users password
   var searchString = req.body.email;
   var newPassword = req.body.password;
   var passwordConfirm = req.body.passwordConf;
-  console.log("This is a search post");
-  console.log(searchString);
   var query = users.findOne({});
 
   query.where('email').in([searchString]);
-  query.exec(function (err, docs) {
-            if (docs == [])
+  query.exec(function (err, updateDoc) {
+            if (updateDoc == [])
              {
-             console.log("nothing found")
+             res.send("nothing found")
              }
              else
              {
-             console.log(docs);
-             docs.set({ password: newPassword });
-             docs.set({ passwordConf: passwordConfirm });
-             docs.save();
-             console.log(docs);
-             res.send(docs);
+             updateDoc.set({ password: newPassword });
+             updateDoc.set({ passwordConf: passwordConfirm });
+             updateDoc.save();
+             res.redirect("http://localhost:3001/update");
              }
    });
 
