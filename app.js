@@ -39,6 +39,10 @@ app.get("/", (req, res) => {
         res.sendFile(__dirname + "/index.html");
         });
 
+app.get("/update", (req, res) => {
+        res.sendFile(__dirname + "/update.html");
+        });
+
 app.get("/search", (req, res) => {
         res.sendFile(__dirname + "/search.html");
         });
@@ -64,7 +68,7 @@ app.post("/search", (req, res) => { //searches users
          var searchString = req.body.data;
          console.log("This is a search post");
          console.log(searchString);
-         var query = users.find({});
+         var query = users.findOne({});
          
          query.where('password').in([searchString]);
          query.exec(function (err, docs) {
@@ -75,6 +79,10 @@ app.post("/search", (req, res) => { //searches users
                     else
                     {
                     console.log(docs);
+                    docs.set({ email: 'newemail' });
+                    docs.save();
+                    console.log(docs);
+                    res.send(docs);
                     }
           });
            //Finds entry that is sent by user and stored in searchString
@@ -95,6 +103,27 @@ app.post("/remove", (req, res) => { //removes users
          //need to add error handling
          });
 
+
+app.post("/update", (req, res) => { //Updates users password
+         var userUpdate = req.body.email;
+         var updatePassword = req.body.password;
+         var updatePasswordConf = req.body.passwordConf;
+         console.log("This is a update post");
+         console.log(userUpdate);
+         console.log(updatePassword);
+         console.log(updatePasswordConf);
+         
+         var updateUserInfo = new users({ email: userUpdate, username: userUpdate, password: updatePassword, passwordConf: updatePasswordConf});
+         
+         console.log(updateUserInfo);
+         
+        
+         
+
+        
+         
+    
+         });
 
 
 app.listen(port, () => {
