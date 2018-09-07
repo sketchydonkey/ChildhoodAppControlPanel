@@ -57,7 +57,7 @@ app.get("/remove", (req, res) => {
 
 app.post("/addname", (req, res) => { //adds users
          var userToAdd = new users(req.body);
-         userToAdd.save();
+         userToAdd.save(); // Need to check is user already here?
 
                //res.send("item saved to database"); //use this for debugging!  -- Add checking for existing user
                res.redirect('http://localhost:3001/add'); // Redirects to home page
@@ -72,7 +72,7 @@ app.post("/search", (req, res) => { //searches users
          query.exec(function (err, result) {
                    if (result == null)
                     {
-                    console.log("nothing found")
+                    console.log("nothing ")
                     }
                     else
                     {
@@ -115,11 +115,18 @@ app.post("/update", (req, res) => { //Updates users password
   var query = users.findOne({});
 
   query.where('email').in([searchString]);
+  console.log(query);
   query.exec(function (err, updateDoc) {
-            if (updateDoc == [])
+            if (updateDoc == [] || updateDoc == null)
              {
-             res.send("nothing found")
+             res.send("No Records Matching that email found! Try Searching for it!")
              }
+
+             else if(newPassword !== passwordConfirm)
+             {
+               res.send("Passwords do not match! Try Again!");
+             }
+
              else
              {
              updateDoc.set({ password: newPassword });
