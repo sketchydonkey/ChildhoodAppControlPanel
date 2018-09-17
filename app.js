@@ -8,6 +8,8 @@ const mongoose = require("mongoose");
 const workingDir = __dirname;
 var mustache = require('mustache');
 var fs = require('fs');
+var searchResults;
+var milestoneResults;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
@@ -17,14 +19,21 @@ mongoose.connect("mongodb://localhost:27017/ChildhoodAppDB");
 var db = mongoose.connection;
 var userSchema = new mongoose.Schema(
 {
-                                     email: String,
-                                     username: String,
-                                     password: String,
-                                     passwordConf: String
+  email: String,
+  username: String,
+  password: String,
+  passwordConf: String
 });
 var users = mongoose.model("users", userSchema);
 
-
+var milestoneSchema = new mongoose.Schema(
+  {
+    email: String,
+    milestoneName: String,
+    startDate: String,
+    endDate: String
+  });
+var milestone = mongoose.model("milestone", milestoneSchema);
 
 
 //_____________GET METHODS__________//
@@ -69,10 +78,7 @@ app.get("/search", (req, res) => {
 
 app.get("/searchConfirmed", (req, res) => {
 
-    var searchResults = [{
-      "email" : foundUserEmail,
-      "username" : foundUserName
-    }];
+
 
     var searchData = {result:searchResults};
     var page = fs.readFileSync(workingDir + "/html/searchConfirmed.html", "utf8");
@@ -100,6 +106,19 @@ app.get("/removeFail", (req, res) => {
 
 
 
+app.get("/milestones", (req, res) => {
+        res.sendFile(workingDir + "/html/milestones.html");
+
+        });
+
+app.get("/milestoneConfirmed", (req, res) => {
+
+    var searchData = {result:milestoneResults};
+    var page = fs.readFileSync(workingDir + "/html/milestoneConfirmed.html", "utf8");
+    var html = mustache.to_html(page, searchData);
+        res.send(html);
+        });
+
 
 
 //_____________POST METHODS__________//
@@ -126,8 +145,9 @@ app.post("/search", (req, res) => { //searches users
                     }
                     else
                     {
-                    foundUserEmail = result.email;
-                    foundUserName = result.username;
+                    //foundUserEmail = result.email;
+                    //foundUserName = result.username;
+                    searchResults = result;
                     res.redirect("/searchConfirmed")
                     }
           });
@@ -187,6 +207,21 @@ app.post("/update", (req, res) => { //Updates users password
    });
 
 });
+
+
+app.post("/searchMilestone", (req, res) => {
+    var searchString = req.body.data;
+    var query = milestone.find({});
+
+     query.where('email').in([searchString]);
+
+     query.exec(function (err, result)
+    {
+        milestoneResults = result;
+        res.redirect("/milestoneConfirmed")
+    });
+
+ });
 
 
 //_____________LISTEN METHODS__________//
