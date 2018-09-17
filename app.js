@@ -3,8 +3,11 @@ var app = express();
 var port = 3001;
 var bodyParser = require('body-parser');
 var foundUserEmail = '';
+var foundUserName = '';
 const mongoose = require("mongoose");
-
+const workingDir = __dirname;
+var mustache = require('mustache');
+var fs = require('fs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
@@ -22,38 +25,91 @@ var userSchema = new mongoose.Schema(
 var users = mongoose.model("users", userSchema);
 
 
+
+
+//_____________GET METHODS__________//
+
+
 app.get("/", (req, res) => {
-        res.sendFile(__dirname + "/index.html");
-        console.log(req.protocol);
-        console.log(req.get('host'));
-        console.log(req.originalUrl);
+        res.sendFile(workingDir + "/html/index.html");
+
         });
 
 
 
-  app.get("/add", (req, res) => {
-        res.sendFile(__dirname + "/add.html");
+app.get("/add", (req, res) => {
+        res.sendFile(workingDir + "/html/add.html");
         });
+
+
+
+app.get("/addConfirmed", (req, res) => {
+        res.sendFile(workingDir + "/html/addConfirmed.html");
+        });
+
+
 
 app.get("/update", (req, res) => {
-        res.sendFile(__dirname + "/update.html");
+        res.sendFile(workingDir + "/html/update.html");
         });
 
-app.get("/search", (req, res) => {
-        res.sendFile(__dirname + "/search.html");
+app.get("/updateConfirmed", (req, res) => {
+        res.sendFile(workingDir + "/html/updateConfirmed.html");
         });
+
+app.get("/updateFail", (req, res) => {
+        res.sendFile(workingDir + "/html/updateFail.html");
+        });
+
+
+
+app.get("/search", (req, res) => {
+        res.sendFile(workingDir + "/html/search.html");
+        });
+
+app.get("/searchConfirmed", (req, res) => {
+
+    var searchResults = [{
+      "email" : foundUserEmail,
+      "username" : foundUserName
+    }];
+
+    var searchData = {result:searchResults};
+    var page = fs.readFileSync(workingDir + "/html/searchConfirmed.html", "utf8");
+    var html = mustache.to_html(page, searchData);
+    res.send(html);;
+        });
+
+app.get("/searchFail", (req, res) => {
+        res.sendFile(workingDir + "/html/searchFail.html");
+      });
 
 
 
 app.get("/remove", (req, res) => {
-        res.sendFile(__dirname + "/remove.html");
+        res.sendFile(workingDir + "/html/remove.html");
         });
+
+app.get("/removeConfirmed", (req, res) => {
+        res.sendFile(workingDir + "/html/removeConfirmed.html");
+        });
+
+app.get("/removeFail", (req, res) => {
+        res.sendFile(workingDir + "/html/removeFail.html");
+        });
+
+
+
+
+
+//_____________POST METHODS__________//
+
 
 app.post("/addname", (req, res) => {
          var userToAdd = new users(req.body);
 
          userToAdd.save(); // Need to check is user already here?
-         res.redirect("/add");
+         res.redirect("/addConfirmed");
          });
 
 app.post("/search", (req, res) => { //searches users
@@ -66,13 +122,13 @@ app.post("/search", (req, res) => { //searches users
          {
                    if (result == null)
                     {
-                    console.log("nothing ")
+                    res.redirect("/searchFail");
                     }
                     else
                     {
-                    console.log(result);
                     foundUserEmail = result.email;
-                    res.redirect("/search")
+                    foundUserName = result.username;
+                    res.redirect("/searchConfirmed")
                     }
           });
 
@@ -88,12 +144,12 @@ app.post("/remove", (req, res) => { //removes users
 
                       if (delUser.n == 1) // A user exists and was deleted
                       {
-                         res.redirect("/remove");
+                         res.redirect("/removeConfirmed");
                       }
 
                       else
                       {
-                        //  console.log("Nothing exists!")
+                        res.redirect("/removeFail");
                       }
 
                     });
@@ -113,12 +169,12 @@ app.post("/update", (req, res) => { //Updates users password
   query.exec(function (err, updateDoc) {
             if (updateDoc == [] || updateDoc == null)
              {
-             res.send("No Records Matching that email found! Try Searching for it!")
+             res.redirect("/updateFail")
              }
 
              else if(newPassword !== passwordConfirm)
              {
-               res.send("Passwords do not match! Try Again!");
+               res.redirect("/updateFail");
              }
 
              else
@@ -126,12 +182,14 @@ app.post("/update", (req, res) => { //Updates users password
              updateDoc.set({ password: newPassword });
              updateDoc.set({ passwordConf: passwordConfirm });
              updateDoc.save();
-             res.redirect("/update");
+             res.redirect("/updateConfirmed");
              }
    });
 
-           });
+});
 
+
+//_____________LISTEN METHODS__________//
 
 app.listen(port, () => {
            console.log("Server listening on port " + port);
