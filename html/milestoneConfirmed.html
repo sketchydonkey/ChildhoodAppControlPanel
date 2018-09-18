@@ -11,6 +11,12 @@
         <p>Milestone Name: {{milestoneName}}</p>
         <p>Start Date: {{startDate}}</p>
         <p>End Date: {{endDate}}</p>
+        <p>{{dir}}</p>
+
+        <form method="POST" action="/viewPics">
+        <input type="hidden" name="test" value="HELLOWORLD">
+        <input type="submit" value="Show Images"/>
+        </form>
         <br />
         {{/result}}
         <a href="/">Home</a><br />

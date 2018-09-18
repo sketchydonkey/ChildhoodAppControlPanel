@@ -31,7 +31,8 @@ var milestoneSchema = new mongoose.Schema(
     email: String,
     milestoneName: String,
     startDate: String,
-    endDate: String
+    endDate: String,
+    dir: []
   });
 var milestone = mongoose.model("milestone", milestoneSchema);
 
@@ -47,6 +48,7 @@ app.get("/", (req, res) => {
 
 
 app.get("/add", (req, res) => {
+        console.log(res.natname);
         res.sendFile(workingDir + "/html/add.html");
         });
 
@@ -131,6 +133,12 @@ app.post("/addname", (req, res) => {
          res.redirect("/addConfirmed");
          });
 
+app.post("/viewPics", (req, res) => {
+          console.log(req.body.test);
+          });
+
+
+
 app.post("/search", (req, res) => { //searches users
          var searchString = req.body.data;
          var query = users.findOne({});
@@ -212,12 +220,25 @@ app.post("/update", (req, res) => { //Updates users password
 app.post("/searchMilestone", (req, res) => {
     var searchString = req.body.data;
     var query = milestone.find({});
+    var numMilestones;
+
 
      query.where('email').in([searchString]);
 
      query.exec(function (err, result)
     {
         milestoneResults = result;
+        numMilestones = result.length;
+        var mstoneNames = [];
+        var stringto;
+        milestoneResults[0].dir[0] = "this";
+        milestoneResults[0].dir[1] = "that";
+
+
+
+         console.log(milestoneResults);
+
+
         res.redirect("/milestoneConfirmed")
     });
 
