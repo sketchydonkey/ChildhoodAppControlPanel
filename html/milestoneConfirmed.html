@@ -11,10 +11,11 @@
         <p>Milestone Name: {{milestoneName}}</p>
         <p>Start Date: {{startDate}}</p>
         <p>End Date: {{endDate}}</p>
-        <p>{{dir}}</p>
+
 
         <form method="POST" action="/viewPics">
-        <input type="hidden" name="test" value="HELLOWORLD">
+        <input type="hidden" name="milestonename" value={{milestoneName}}>
+        <input type="hidden" name ="username" value={{email}}>
         <input type="submit" value="Show Images"/>
         </form>
         <br />

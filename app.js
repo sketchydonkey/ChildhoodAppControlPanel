@@ -9,9 +9,11 @@ const workingDir = __dirname;
 var mustache = require('mustache');
 var fs = require('fs');
 var searchResults;
+var dirHandler;
 var milestoneResults;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
+app.use(express.static('Images'));
 
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/ChildhoodAppDB");
@@ -31,11 +33,15 @@ var milestoneSchema = new mongoose.Schema(
     email: String,
     milestoneName: String,
     startDate: String,
-    endDate: String,
-    dir: []
+    endDate: String
   });
 var milestone = mongoose.model("milestone", milestoneSchema);
-
+var dirSchema = new mongoose.Schema(
+  { name: String,
+    dir: String
+  });
+var imgDirectory = mongoose.model("dirSchema", milestoneSchema);
+var dirObject = new imgDirectory;
 
 //_____________GET METHODS__________//
 
@@ -116,10 +122,23 @@ app.get("/milestones", (req, res) => {
 app.get("/milestoneConfirmed", (req, res) => {
 
     var searchData = {result:milestoneResults};
+    console.log(searchData);
     var page = fs.readFileSync(workingDir + "/html/milestoneConfirmed.html", "utf8");
     var html = mustache.to_html(page, searchData);
         res.send(html);
         });
+
+app.get("/displayPics", (req, res) => {
+
+
+  var imgData = {pictures:dirObject};
+  console.log(imgData);
+  var page = fs.readFileSync(workingDir + "/html/viewPics.html", "utf8");
+  var html = mustache.to_html(page, imgData);
+      res.send(html);
+});
+
+
 
 
 
@@ -133,9 +152,6 @@ app.post("/addname", (req, res) => {
          res.redirect("/addConfirmed");
          });
 
-app.post("/viewPics", (req, res) => {
-          console.log(req.body.test);
-          });
 
 
 
@@ -228,21 +244,51 @@ app.post("/searchMilestone", (req, res) => {
      query.exec(function (err, result)
     {
         milestoneResults = result;
+        console.log(result);
         numMilestones = result.length;
-        var mstoneNames = [];
-        var stringto;
-        milestoneResults[0].dir[0] = "this";
-        milestoneResults[0].dir[1] = "that";
-
-
-
-         console.log(milestoneResults);
-
-
         res.redirect("/milestoneConfirmed")
     });
 
  });
+
+
+
+ app.post("/viewPics", (req, res) => {
+
+
+
+
+
+
+           var picDir = "/Images/" + req.body.username + "/" + req.body.milestonename + "/";
+           var dirForJSON = '\/'+'Images'+'\/' + req.body.username + '\/' + req.body.milestonename + '\/';
+           var stringToConvert;
+           var test = [];
+
+           fs.readdir(workingDir + picDir, function(err, items) {
+            for (var i=0; i<items.length; i++)
+             {
+
+             }
+// Try schema of objects
+
+
+         dirObject.dir = picDir + items[0];
+         dirObject.name = items[0];
+
+         });
+
+
+           res.redirect("/displayPics");
+ });
+
+
+
+ app.post("/sendPic", (req, res) => {
+          console.log(req.body.toServe);
+          res.sendFile(workingDir + req.body.toServe);
+          });
+
 
 
 //_____________LISTEN METHODS__________//

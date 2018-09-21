@@ -5,6 +5,13 @@
     </head>
 
     <body>
-        
+        <h1>Search Result</h1>
+        {{#pictures}}
+        <form method="POST" action="/sendPic">
+        <input type="hidden" name="toServe" value={{dir}}>
+        <input type="submit" value="{{name}}"/>
+        </form>
+        {{/pictures}}
+        <a href="/">Home</a><br />
     </body>
 </html>
