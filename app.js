@@ -43,6 +43,17 @@ var dirSchema = new mongoose.Schema(
 var imgDirectory = mongoose.model("dirSchema", milestoneSchema);
 var dirObject = new imgDirectory;
 
+
+
+//Testing for schema array
+var ToySchema = new mongoose.Schema({ name: String, dir: String });
+var ToyBoxSchema = new mongoose.Schema({
+  toys: [ToySchema]
+});
+var Toys = mongoose.model("Toys", ToySchema);
+var ToyBox = mongoose.model("ToyBox", ToyBoxSchema);
+var test = new ToyBox;
+
 //_____________GET METHODS__________//
 
 
@@ -131,10 +142,10 @@ app.get("/milestoneConfirmed", (req, res) => {
 app.get("/displayPics", (req, res) => {
 
 
-  var imgData = {pictures:dirObject};
+  var imgData = {pictures:test};
   console.log(imgData);
   var page = fs.readFileSync(workingDir + "/html/viewPics.html", "utf8");
-  var html = mustache.to_html(page, imgData);
+  var html = mustache.to_html(page, test);
       res.send(html);
 });
 
@@ -263,16 +274,28 @@ app.post("/searchMilestone", (req, res) => {
            var picDir = "/Images/" + req.body.username + "/" + req.body.milestonename + "/";
            var dirForJSON = '\/'+'Images'+'\/' + req.body.username + '\/' + req.body.milestonename + '\/';
            var stringToConvert;
-           var test = [];
+
+
+
+
+
+
+
+
 
            fs.readdir(workingDir + picDir, function(err, items) {
             for (var i=0; i<items.length; i++)
              {
+                 var test2 = new Toys;
+                 test2.name = items[i];
+                 test2.dir = picDir + items[i];
+                 test.toys[i] = test2;
+
 
              }
 // Try schema of objects
 
-
+         console.log(test);
          dirObject.dir = picDir + items[0];
          dirObject.name = items[0];
 
