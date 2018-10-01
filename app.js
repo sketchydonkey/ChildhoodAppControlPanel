@@ -8,7 +8,7 @@ const port = 3001;
 const workingDir = __dirname;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
-app.use(express.static('Images'));
+app.use(express.static(workingDir + '/'));
 
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/ChildhoodAppDB");
@@ -116,6 +116,10 @@ app.get("/removeFail", (req, res) => {
 
 app.get("/milestones", (req, res) => {
     res.sendFile(workingDir + "/html/milestones.html");
+});
+
+app.get("/noImages", (req, res) => {
+    res.sendFile(workingDir + "/html/noImages.html");
 });
 
 app.get("/milestoneConfirmed", (req, res) => {
@@ -283,7 +287,13 @@ app.post("/viewPics", (req, res) => {
     var objectIndex = 0;
     fs.readdir(workingDir + picDir, function(err, items)
     {
-    // IF ITEMS == NULL OR UNDEFINED DO SOMETHING (ERROR HANDLING)
+
+      if(items[0] == undefined)
+      {
+        res.redirect("/noImages");
+      }
+    else
+    {
       for (var i=0; i<items.length; i++)
       {
         if (items[i] == ".DS_Store")
@@ -300,10 +310,12 @@ app.post("/viewPics", (req, res) => {
         }
 
       }
+      objectIndex = 0;
+      picObject = tempPicObject;
+      res.redirect("/displayPics");
+    }
     });
-         objectIndex = 0;
-         picObject = tempPicObject;
-         res.redirect("/displayPics");
+
  });
 
 app.post("/sendPic", (req, res) => {

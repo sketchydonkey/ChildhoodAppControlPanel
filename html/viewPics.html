@@ -5,13 +5,11 @@
     </head>
 
     <body>
-        <h1>Select Image to Display</h1>
+        <h1>Milestone Images</h1>
         {{#info}}
-        <form method="POST" action="/sendPic">
-        <input type="hidden" name="toServe" value={{dir}}>
-        <input type="submit" value="{{name}}"/>
-        </form>
+        <img src="{{dir}}" height="200" width="200" alt="P">
         {{/info}}
+      </br>
         <a href="/">Home</a><br />
     </body>
 </html>
