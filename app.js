@@ -1,16 +1,11 @@
 var express = require("express");
-var app = express();
-var port = 3001;
-var bodyParser = require('body-parser');
-var foundUserEmail = '';
-var foundUserName = '';
-const mongoose = require("mongoose");
-const workingDir = __dirname;
-var mustache = require('mustache');
 var fs = require('fs');
-var searchResults;
-var dirHandler;
-var milestoneResults;
+var bodyParser = require('body-parser');
+const mongoose = require("mongoose");
+var mustache = require('mustache');
+var app = express();
+const port = 3001;
+const workingDir = __dirname;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(express.static('Images'));
@@ -37,10 +32,6 @@ var milestoneSchema = new mongoose.Schema(
   });
 var milestone = mongoose.model("milestone", milestoneSchema);
 
-
-
-
-
 var imgInfoSchema = new mongoose.Schema(
   { name: String,
     dir: String
@@ -54,7 +45,12 @@ var infoContainerSchema = new mongoose.Schema(
 
 var info = mongoose.model("imgInfo", imgInfoSchema);
 var infoContainer = mongoose.model("infoContainer", infoContainerSchema);
+
+
 var picObject = new infoContainer;
+var searchResults;
+var milestoneResults;
+
 
 //_____________GET METHODS__________//
 
@@ -91,16 +87,11 @@ app.get("/updateFail", (req, res) => {
         res.sendFile(workingDir + "/html/updateFail.html");
         });
 
-
-
 app.get("/search", (req, res) => {
         res.sendFile(workingDir + "/html/search.html");
         });
 
 app.get("/searchConfirmed", (req, res) => {
-
-
-
     var searchData = {result:searchResults};
     var page = fs.readFileSync(workingDir + "/html/searchConfirmed.html", "utf8");
     var html = mustache.to_html(page, searchData);
@@ -110,8 +101,6 @@ app.get("/searchConfirmed", (req, res) => {
 app.get("/searchFail", (req, res) => {
         res.sendFile(workingDir + "/html/searchFail.html");
       });
-
-
 
 app.get("/remove", (req, res) => {
         res.sendFile(workingDir + "/html/remove.html");
@@ -125,187 +114,137 @@ app.get("/removeFail", (req, res) => {
         res.sendFile(workingDir + "/html/removeFail.html");
         });
 
-
-
 app.get("/milestones", (req, res) => {
         res.sendFile(workingDir + "/html/milestones.html");
-
         });
 
 app.get("/milestoneConfirmed", (req, res) => {
-
     var searchData = {result:milestoneResults};
     var page = fs.readFileSync(workingDir + "/html/milestoneConfirmed.html", "utf8");
     var html = mustache.to_html(page, searchData);
-        res.send(html);
+    res.send(html);
         });
 
 app.get("/displayPics", (req, res) => {
-
-
-  var imgData = {pictures:picObject};
-  var page = fs.readFileSync(workingDir + "/html/viewPics.html", "utf8");
-  var html = mustache.to_html(page, picObject);
-      res.send(html);
-});
-
-
-
-
+    var imgData = {pictures:picObject};
+    var page = fs.readFileSync(workingDir + "/html/viewPics.html", "utf8");
+    var html = mustache.to_html(page, picObject);
+    res.send(html);
+        });
 
 //_____________POST METHODS__________//
 
 
 app.post("/addname", (req, res) => {
-         var userToAdd = new users(req.body);
-
-         userToAdd.save(); // Need to check is user already here?
-         res.redirect("/addConfirmed");
+    var userToAdd = new users(req.body);
+    userToAdd.save(); // Need to check is user already here?
+    res.redirect("/addConfirmed");
          });
-
-
-
 
 app.post("/search", (req, res) => { //searches users
-         var searchString = req.body.data;
-         var query = users.findOne({});
+    var searchString = req.body.data;
+    var query = users.findOne({});
+    query.where('email').in([searchString]);
 
-         query.where('email').in([searchString]);
+    query.exec(function (err, result)
+    {
+      if (result == null)
+      {
+        res.redirect("/searchFail");
+      }
+      else
+      {
+        searchResults = result;
+        res.redirect("/searchConfirmed")
+      }
 
-         query.exec(function (err, result)
-         {
-                   if (result == null)
-                    {
-                    res.redirect("/searchFail");
-                    }
-                    else
-                    {
-                    //foundUserEmail = result.email;
-                    //foundUserName = result.username;
-                    searchResults = result;
-                    res.redirect("/searchConfirmed")
-                    }
-          });
+      });
+});
 
-         });
+app.post("/remove", (req, res) => {
+     var removeString = req.body.data;
+     var query = users.deleteOne({});
+     query.where('email').in([removeString]);
 
+     query.exec(function (err, delUser)
+     {
+      if (delUser.n == 1) // A user exists and was deleted
+      {
+         res.redirect("/removeConfirmed");
+      }
+      else
+      {
+         res.redirect("/removeFail");
+      }
 
-app.post("/remove", (req, res) => { //removes users
-         var removeString = req.body.data;
-         var query = users.deleteOne({});
-
-         query.where('email').in([removeString]);
-         query.exec(function (err, delUser) {
-
-                      if (delUser.n == 1) // A user exists and was deleted
-                      {
-                         res.redirect("/removeConfirmed");
-                      }
-
-                      else
-                      {
-                        res.redirect("/removeFail");
-                      }
-
-                    });
-
-
-         });
+      });
+});
 
 
 app.post("/update", (req, res) => { //Updates users password
 
-  var searchString = req.body.email;
-  var newPassword = req.body.password;
-  var passwordConfirm = req.body.passwordConf;
-  var query = users.findOne({});
+    var searchString = req.body.email;
+    var newPassword = req.body.password;
+    var passwordConfirm = req.body.passwordConf;
+    var query = users.findOne({});
+    query.where('email').in([searchString]);
 
-  query.where('email').in([searchString]);
-  query.exec(function (err, updateDoc) {
-            if (updateDoc == [] || updateDoc == null)
-             {
-             res.redirect("/updateFail")
-             }
-
-             else if(newPassword !== passwordConfirm)
-             {
-               res.redirect("/updateFail");
-             }
-
-             else
-             {
-             updateDoc.set({ password: newPassword });
-             updateDoc.set({ passwordConf: passwordConfirm });
-             updateDoc.save();
-             res.redirect("/updateConfirmed");
-             }
-   });
+    query.exec(function (err, updateDoc)
+    {
+      if (updateDoc == [] || updateDoc == null)
+      {
+         res.redirect("/updateFail")
+      }
+      else if(newPassword !== passwordConfirm)
+      {
+         res.redirect("/updateFail");
+      }
+      else
+      {
+          updateDoc.set({ password: newPassword });
+          updateDoc.set({ passwordConf: passwordConfirm });
+          updateDoc.save();
+          res.redirect("/updateConfirmed");
+       }
+     });
 
 });
-
 
 app.post("/searchMilestone", (req, res) => {
     var searchString = req.body.data;
     var query = milestone.find({});
-    var numMilestones;
+    query.where('email').in([searchString]);
 
-
-     query.where('email').in([searchString]);
-
-     query.exec(function (err, result)
+    query.exec(function (err, result)
     {
         milestoneResults = result;
-        numMilestones = result.length;
         res.redirect("/milestoneConfirmed")
     });
 
  });
 
+app.post("/viewPics", (req, res) => {
+    var picDir = "/Images/" + req.body.username + "/" + req.body.milestonename + "/";
 
-
- app.post("/viewPics", (req, res) => {
-
-
-
-
-
-
-           var picDir = "/Images/" + req.body.username + "/" + req.body.milestonename + "/";
-           var dirForJSON = '\/'+'Images'+'\/' + req.body.username + '\/' + req.body.milestonename + '\/';
-           var stringToConvert;
-
-
-
-     fs.readdir(workingDir + picDir, function(err, items) {
-            for (var i=0; i<items.length; i++)
-             {
-                 var picInfo = new info;
-                 picInfo.name = items[i];
-                 picInfo.dir = picDir + items[i];
-                 picObject.info[i] = picInfo;
-
-
-             }
-
-
-
-         });
-
-
-           res.redirect("/displayPics");
+    fs.readdir(workingDir + picDir, function(err, items)
+    {
+      for (var i=0; i<items.length; i++)
+      {
+        var picInfo = new info;
+        picInfo.name = items[i];
+        picInfo.dir = picDir + items[i];
+        picObject.info[i] = picInfo;
+      }
+    });
+         res.redirect("/displayPics");
  });
 
-
-
- app.post("/sendPic", (req, res) => {
-
-          res.sendFile(workingDir + req.body.toServe);
-          });
-
-
+app.post("/sendPic", (req, res) => {
+        res.sendFile(workingDir + req.body.toServe);
+ });
 
 //_____________LISTEN METHODS__________//
 
 app.listen(port, () => {
-           console.log("Server listening on port " + port);
-           });
+         console.log("Server listening on port " + port);
+  });
