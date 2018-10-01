@@ -36,23 +36,25 @@ var milestoneSchema = new mongoose.Schema(
     endDate: String
   });
 var milestone = mongoose.model("milestone", milestoneSchema);
-var dirSchema = new mongoose.Schema(
+
+
+
+
+
+var imgInfoSchema = new mongoose.Schema(
   { name: String,
     dir: String
   });
-var imgDirectory = mongoose.model("dirSchema", milestoneSchema);
-var dirObject = new imgDirectory;
 
 
+var infoContainerSchema = new mongoose.Schema(
+  {
+    info: [imgInfoSchema]
+  });
 
-//Testing for schema array
-var ToySchema = new mongoose.Schema({ name: String, dir: String });
-var ToyBoxSchema = new mongoose.Schema({
-  toys: [ToySchema]
-});
-var Toys = mongoose.model("Toys", ToySchema);
-var ToyBox = mongoose.model("ToyBox", ToyBoxSchema);
-var test = new ToyBox;
+var info = mongoose.model("imgInfo", imgInfoSchema);
+var infoContainer = mongoose.model("infoContainer", infoContainerSchema);
+var picObject = new infoContainer;
 
 //_____________GET METHODS__________//
 
@@ -65,7 +67,7 @@ app.get("/", (req, res) => {
 
 
 app.get("/add", (req, res) => {
-        console.log(res.natname);
+
         res.sendFile(workingDir + "/html/add.html");
         });
 
@@ -133,7 +135,6 @@ app.get("/milestones", (req, res) => {
 app.get("/milestoneConfirmed", (req, res) => {
 
     var searchData = {result:milestoneResults};
-    console.log(searchData);
     var page = fs.readFileSync(workingDir + "/html/milestoneConfirmed.html", "utf8");
     var html = mustache.to_html(page, searchData);
         res.send(html);
@@ -142,10 +143,9 @@ app.get("/milestoneConfirmed", (req, res) => {
 app.get("/displayPics", (req, res) => {
 
 
-  var imgData = {pictures:test};
-  console.log(imgData);
+  var imgData = {pictures:picObject};
   var page = fs.readFileSync(workingDir + "/html/viewPics.html", "utf8");
-  var html = mustache.to_html(page, test);
+  var html = mustache.to_html(page, picObject);
       res.send(html);
 });
 
@@ -255,7 +255,6 @@ app.post("/searchMilestone", (req, res) => {
      query.exec(function (err, result)
     {
         milestoneResults = result;
-        console.log(result);
         numMilestones = result.length;
         res.redirect("/milestoneConfirmed")
     });
@@ -277,27 +276,18 @@ app.post("/searchMilestone", (req, res) => {
 
 
 
-
-
-
-
-
-
-           fs.readdir(workingDir + picDir, function(err, items) {
+     fs.readdir(workingDir + picDir, function(err, items) {
             for (var i=0; i<items.length; i++)
              {
-                 var test2 = new Toys;
-                 test2.name = items[i];
-                 test2.dir = picDir + items[i];
-                 test.toys[i] = test2;
+                 var picInfo = new info;
+                 picInfo.name = items[i];
+                 picInfo.dir = picDir + items[i];
+                 picObject.info[i] = picInfo;
 
 
              }
-// Try schema of objects
 
-         console.log(test);
-         dirObject.dir = picDir + items[0];
-         dirObject.name = items[0];
+
 
          });
 
@@ -308,7 +298,7 @@ app.post("/searchMilestone", (req, res) => {
 
 
  app.post("/sendPic", (req, res) => {
-          console.log(req.body.toServe);
+
           res.sendFile(workingDir + req.body.toServe);
           });
 

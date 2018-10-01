@@ -6,12 +6,12 @@
 
     <body>
         <h1>Select Image to Display</h1>
-        {{#toys}}
+        {{#info}}
         <form method="POST" action="/sendPic">
         <input type="hidden" name="toServe" value={{dir}}>
         <input type="submit" value="{{name}}"/>
         </form>
-        {{/toys}}
+        {{/info}}
         <a href="/">Home</a><br />
     </body>
 </html>
