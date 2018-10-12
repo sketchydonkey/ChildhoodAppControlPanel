@@ -1,15 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100 w-100"
     <head>
-        <title>Early Childhood Control Panel</title>
+        <link rel="stylesheet" href="bootstrap\css\bootstrap.min.css">
+		<link rel="stylesheet" href="open-iconic\font\css\open-iconic-bootstrap.min.css">
+        <title>Ready, Steady, Go! - Search Users</title>
     </head>
 
-    <body>
-        <h1>Search Result</h1>
-        {{#result}}
-        <p>Email: {{email}}</p>
-        <p>Username: {{username}}</p>
-        {{/result}}
-        <a href="/">Home</a><br />
+    <body class="h-100 w-100 pt-2">
+		<div class="col-6 m-auto border pt-2 pb-3 px-3 rounded" style="background-color:#f7f7f9;">
+			<div class="text-center">
+				<h2>User Found!</h2>
+			</div>
+			<div class="col-4 m-auto">
+				{{#result}}
+				<p>Email: {{email}}</p>
+				<p>Username: {{username}}</p>
+				{{/result}}
+			</div>
+			<div class="row justify-content-center text-center">
+				<div class="pr-3 border-right border-dark">
+					<span class="oi oi-people text-success p-2"></span>
+					<a href="search.html">Search For Another User</a>
+				</div>
+				<div class="pl-2">
+					<span class="oi oi-account-login text-success p-2"></span>
+					<a href="index.html">Home</a>
+				</div>
+			</div>
+		</div>
     </body>
 </html>

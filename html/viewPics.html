@@ -1,17 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100 w-100"
     <head>
-        <title>Early Childhood Control Panel</title>
+        <link rel="stylesheet" href="bootstrap\css\bootstrap.min.css">
+		<link rel="stylesheet" href="open-iconic\font\css\open-iconic-bootstrap.min.css">
+        <title>Ready, Steady, Go! - Images</title>
     </head>
 
-    <body>
-        <h1>Select Image to Display</h1>
-        {{#toys}}
-        <form method="POST" action="/sendPic">
-        <input type="hidden" name="toServe" value={{dir}}>
-        <input type="submit" value="{{name}}"/>
-        </form>
-        {{/toys}}
-        <a href="/">Home</a><br />
+    <body class="h-100 w-100 pt-2">
+		<div class="col-6 m-auto border pt-2 pb-3 px-3 rounded" style="background-color:#f7f7f9;">
+			<div class="text-center">
+				<h2>Select Image</h2>
+			</div>
+			{{#toys}}
+			<form method="post" action="/sendPic">
+				<div class="form-group">
+					<input type="hidden" name="toServe" value={{dir}}>
+					<button type="submit" class="btn btn-primary">{{name}}</button>
+					<a class="btn btn-link" href="index.html">Home</a>
+				</div>
+			</form>
+			{{/toys}}
+		</div>
     </body>
 </html>
