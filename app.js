@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true}));
 app.use(express.static(workingDir + '/'));
 
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/ChildhoodAppDB");
+mongoose.connect("mongodb://192.168.1.3:27017/ChildhoodAppDB");
 
 var db = mongoose.connection;
 var userSchema = new mongoose.Schema(

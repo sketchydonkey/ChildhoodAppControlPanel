@@ -1,18 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100 w-100"
     <head>
-        <title>Early Childhood Control Panel</title>
+        <link rel="stylesheet" href="html/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="html/open-iconic/font/css/open-iconic-bootstrap.min.css">
+        <title>Ready, Steady, Go! - Reset Password</title>
     </head>
 
-    <body>
-        <h1>Update User</h1>
-
-        <form method="post" action="/update"/>
-            <label>Update User Password</label><br />
-            <input type="email" name="email" placeholder="Enter Email..." required/><br />
-            <input type="password" name="password" placeholder="Enter Password..." required/><br />
-            <input type="password" name="passwordConf" placeholder="Enter Password Again..." required/><br />
-            <input type="submit" value="Submit Data"/>
-        </form>
+    <body class="h-100 w-100 pt-2">
+		<div class="col-6 m-auto border pt-2 pb-3 px-3 rounded" style="background-color:#f7f7f9;">
+			<div class="text-center">
+				<h2>Reset Password</h2>
+			</div>
+			<form method="post" action="/update">
+				<div class="form-group">
+					<input class="form-control" type="email" name="email" placeholder="Email" required/>
+				</div>
+				<div class="form-row mb-3">
+					<div class="col">
+						<input class="form-control" type="password" name="password" placeholder="New Password" required/>
+					</div>
+					<div class="col">
+						<input class="form-control" type="password" name="passwordConf" placeholder="Confirm Password" required/>
+					</div>
+				</div>
+				<button type="submit" class="btn btn-primary">Submit</button>
+				<a class="btn btn-link" href="/">Home</a>
+			</form>
+		</div>
     </body>
 </html>

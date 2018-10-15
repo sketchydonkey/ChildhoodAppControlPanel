@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100 w-100"
     <head>
-        <title>Early Childhood Control Panel</title>
+        <link rel="stylesheet" href="html/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="html/open-iconic/font/css/open-iconic-bootstrap.min.css">
+        <title>Ready, Steady, Go! - Images</title>
     </head>
 
-    <body>
+    <body class="h-100 w-100 pt-2">
+		<div class="col-6 m-auto border pt-2 pb-3 px-3 rounded" style="background-color:#f7f7f9;">
         <h1>Milestone Images</h1>
         {{#info}}
         <img src="{{dir}}" height="200" width="200" alt="P">
         {{/info}}
       </br>
-        <a href="/">Home</a><br />
+        <a class="btn btn-link" href="/">Home</a><br />
+      </div>
     </body>
 </html>
