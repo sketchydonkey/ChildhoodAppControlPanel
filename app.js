@@ -6,6 +6,8 @@ var mustache = require('mustache');
 var app = express();
 const port = 3001;
 const workingDir = __dirname;
+const bcrypt = require('bcrypt');
+const saltRounds = 13;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(express.static(workingDir + '/'));
@@ -55,36 +57,59 @@ var milestoneResults;
 //_____________GET METHODS__________//
 
 
-app.get("/", (req, res) => {
-    res.sendFile(workingDir + "/html/index.html");
+app.get("/", (req,res) =>
+{
+  res.sendFile(workingDir + "/html/login.html");
+});
+
+app.get("/home", (req, res) => {
+
+
+      res.sendFile(workingDir + "/html/index.html");
+
+
+
+
 });
 
 app.get("/add", (req, res) => {
+
     res.sendFile(workingDir + "/html/add.html");
+
 });
 
 app.get("/addConfirmed", (req, res) => {
+
     res.sendFile(workingDir + "/html/addConfirmed.html");
 });
 
 app.get("/addFail", (req, res) => {
+
     res.sendFile(workingDir + "/html/addFail.html");
 });
 
 app.get("/userExists", (req, res) => {
+
     res.sendFile(workingDir + "/html/userExists.html");
+
 });
 
 app.get("/update", (req, res) => {
+
     res.sendFile(workingDir + "/html/update.html");
+
 });
 
 app.get("/updateConfirmed", (req, res) => {
+
     res.sendFile(workingDir + "/html/updateConfirmed.html");
+
 });
 
 app.get("/updateFail", (req, res) => {
+
     res.sendFile(workingDir + "/html/updateFail.html");
+
 });
 
 app.get("/search", (req, res) => {
@@ -92,25 +117,35 @@ app.get("/search", (req, res) => {
 });
 
 app.get("/searchConfirmed", (req, res) => {
+
     var searchData = {result:searchResults};
     var page = fs.readFileSync(workingDir + "/html/searchConfirmed.html", "utf8");
     var html = mustache.to_html(page, searchData);
-    res.send(html);;
+    res.send(html);
+
 });
 
 app.get("/searchFail", (req, res) => {
+  if (checkSession() == true)
+  {
     res.sendFile(workingDir + "/html/searchFail.html");
+  }
+    else res.sendFile(workingDir + "/html/login.html");
 });
 
 app.get("/remove", (req, res) => {
+
     res.sendFile(workingDir + "/html/remove.html");
+
 });
 
 app.get("/removeConfirmed", (req, res) => {
+
     res.sendFile(workingDir + "/html/removeConfirmed.html");
 });
 
 app.get("/removeFail", (req, res) => {
+
     res.sendFile(workingDir + "/html/removeFail.html");
 });
 
@@ -123,6 +158,7 @@ app.get("/noImages", (req, res) => {
 });
 
 app.get("/milestoneConfirmed", (req, res) => {
+
     var searchData = {result:milestoneResults};
     var page = fs.readFileSync(workingDir + "/html/milestoneConfirmed.html", "utf8");
     var html = mustache.to_html(page, searchData);
@@ -130,7 +166,9 @@ app.get("/milestoneConfirmed", (req, res) => {
 });
 
 app.get("/milestoneSearchFail", (req, res) => {
+
     res.sendFile(workingDir + "/html/milestoneSearchFail.html");
+
 });
 
 app.get("/displayPics", (req, res) => {
@@ -148,6 +186,7 @@ app.post("/addname", (req, res) => {
     var p = req.body.password;
     var pConf = req.body.passwordConf;
     var searchString = req.body.email;
+    var hashedPass;
     var query = users.findOne({});
     if (p == pConf )
     {
@@ -157,8 +196,16 @@ app.post("/addname", (req, res) => {
       {
         if (result == null)
         {
+
+          bcrypt.hash(p, saltRounds, function(err, hash)
+        {
+            hashedPass = hash;
+            userToAdd.password = hashedPass;
+            userToAdd.passwordConf = hashedPass;
+
           userToAdd.save();
           res.redirect("/addConfirmed");
+        });
         }
         else
         {
@@ -222,6 +269,7 @@ app.post("/update", (req, res) => { //Updates users password
     var searchString = req.body.email;
     var newPassword = req.body.password;
     var passwordConfirm = req.body.passwordConf;
+    var hashedPass;
     var query = users.findOne({});
     query.where('email').in([searchString]);
 
@@ -237,10 +285,16 @@ app.post("/update", (req, res) => { //Updates users password
       }
       else
       {
-          updateDoc.set({ password: newPassword });
-          updateDoc.set({ passwordConf: passwordConfirm });
-          updateDoc.save();
-          res.redirect("/updateConfirmed");
+
+          bcrypt.hash(newPassword, saltRounds, function(err, hash)
+        {
+            hashedPass = hash;
+            updateDoc.set({ password: hashedPass });
+            updateDoc.set({ passwordConf: hashedPass });
+            updateDoc.save();
+            res.redirect("/updateConfirmed");
+        });
+
        }
      });
 
@@ -283,7 +337,7 @@ app.post("/searchMilestone", (req, res) => {
 
 app.post("/viewPics", (req, res) => {
     tempPicObject = new infoContainer;
-    var picDir = "/Images/" + req.body.username + "/" + req.body.milestonename + "/";
+    var picDir = "/Images/MilestonePics/" + req.body.username + "/" + req.body.milestonename + "/";
     var objectIndex = 0;
     fs.readdir(workingDir + picDir, function(err, items)
     {
@@ -321,6 +375,11 @@ app.post("/viewPics", (req, res) => {
 app.post("/sendPic", (req, res) => {
         res.sendFile(workingDir + req.body.toServe);
  });
+
+ app.post("/authenticate", (req, res) => {
+
+   res.redirect("/home");
+  });
 
 //_____________LISTEN METHODS__________//
 

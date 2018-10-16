@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html class="h-100 w-100"
+    <head>
+        <link rel="stylesheet" href="html/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="html/open-iconic/font/css/open-iconic-bootstrap.min.css">
+        <title>Ready, Steady, Go! - Authenticate</title>
+    </head>
+
+    <body class="h-100 w-100 pt-2">
+		<div class="col-6 m-auto border pt-2 pb-3 px-3 rounded" style="background-color:#f7f7f9;">
+			<div class="text-center">
+				<h2>Please Enter Authentication</h2>
+			</div>
+			<form method="post" action="/authenticate">
+				<div class="form-group">
+					<input class="form-control" type="password" name="data" placeholder="Password" required/>
+				</div>
+				<button type="submit" class="btn btn-primary">Authenticate</button>
+			</form>
+		</div>
+    </body>
+</html>
